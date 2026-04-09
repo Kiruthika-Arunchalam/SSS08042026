@@ -288,31 +288,64 @@ if view_mode == "Top Operators (Bar)":
 # ---------------------------
 # TREEMAP VIEW
 # ---------------------------
-elif view_mode == "Treemap View":
+# ---------------------------
+# IMPROVED TREEMAP
+# ---------------------------
+st.markdown('<div class="section">Operator Distribution (Clean Treemap)</div>', unsafe_allow_html=True)
 
-    fig_tree = px.treemap(
-        trend,
-        path=["Operator"],
-        values="Count",
-        color="Count",
-        color_continuous_scale="Blues"
-    )
+# Prepare Data
+trend = filtered_df["Operator_Code"].value_counts().reset_index()
+trend.columns = ["Operator", "Count"]
 
-    st.plotly_chart(style_chart(fig_tree), use_container_width=True)
+# Top N selection
+top_n = st.slider("Treemap Top Operators", 5, 30, 15)
 
+top_df = trend.head(top_n)
+
+others_count = trend["Count"][top_n:].sum()
+
+if others_count > 0:
+    others_df = pd.DataFrame({
+        "Operator": ["OTHERS"],
+        "Count": [others_count]
+    })
+    treemap_df = pd.concat([top_df, others_df])
+else:
+    treemap_df = top_df
+
+# Treemap
+fig_tree = px.treemap(
+    treemap_df,
+    path=["Operator"],
+    values="Count",
+    color="Count",
+    color_continuous_scale="Blues"
+)
+
+# Improve layout
+fig_tree.update_traces(
+    textinfo="label+value",
+    textfont_size=14
+)
+
+fig_tree.update_layout(
+    margin=dict(t=30, l=10, r=10, b=10)
+)
+
+st.plotly_chart(style_chart(fig_tree), use_container_width=True)
 # ---------------------------
 # DATA TABLE (SEARCHABLE)
 # ---------------------------
-else:
+# else:
 
-    search = st.text_input("🔍 Search Operator")
+#     search = st.text_input("🔍 Search Operator")
 
-    if search:
-        table_df = trend[trend["Operator"].str.contains(search, case=False)]
-    else:
-        table_df = trend
+#     if search:
+#         table_df = trend[trend["Operator"].str.contains(search, case=False)]
+#     else:
+#         table_df = trend
 
-    st.dataframe(table_df, use_container_width=True)
+#     st.dataframe(table_df, use_container_width=True)
 # ---------------------------
 # TOP ROUTES
 # ---------------------------
