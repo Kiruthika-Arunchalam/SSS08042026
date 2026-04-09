@@ -217,25 +217,102 @@ st.dataframe(final_df, use_container_width=True)
 # ---------------------------
 # OPERATOR TREND
 # ---------------------------
-st.markdown('<div class="section">Operator Count(07-04-2026)</div>', unsafe_allow_html=True)
+# st.markdown('<div class="section">Operator Count(07-04-2026)</div>', unsafe_allow_html=True)
 
+# trend = filtered_df["Operator_Code"].value_counts().reset_index()
+# trend.columns = ["Operator", "Count"]
+
+# fig = px.bar(
+#     trend,
+#     x="Operator",
+#     y="Count",
+#     color="Operator",
+#     text="Count",
+#     color_discrete_sequence=px.colors.qualitative.Bold
+# )
+
+# fig.update_traces(textposition="outside", textfont=dict(color=text_color))
+# fig.update_layout(showlegend=False)
+
+# st.plotly_chart(style_chart(fig), use_container_width=True)
+# ---------------------------
+# OPERATOR ANALYTICS (NEW)
+# ---------------------------
+st.markdown('<div class="section">Operator Analytics</div>', unsafe_allow_html=True)
+
+# Prepare Data
 trend = filtered_df["Operator_Code"].value_counts().reset_index()
 trend.columns = ["Operator", "Count"]
 
-fig = px.bar(
-    trend,
-    x="Operator",
-    y="Count",
-    color="Operator",
-    text="Count",
-    color_discrete_sequence=px.colors.qualitative.Bold
+# ---------------------------
+# VIEW MODE TOGGLE
+# ---------------------------
+view_mode = st.radio(
+    "Select View",
+    ["Top Operators (Bar)", "Treemap View", "Data Table"]
 )
 
-fig.update_traces(textposition="outside", textfont=dict(color=text_color))
-fig.update_layout(showlegend=False)
+# ---------------------------
+# TOP OPERATORS (BAR CHART)
+# ---------------------------
+if view_mode == "Top Operators (Bar)":
 
-st.plotly_chart(style_chart(fig), use_container_width=True)
+    top_n = st.slider("Select Top Operators", 5, 30, 15)
 
+    top_df = trend.head(top_n)
+
+    others_count = trend["Count"][top_n:].sum()
+
+    if others_count > 0:
+        others_df = pd.DataFrame({
+            "Operator": ["OTHERS"],
+            "Count": [others_count]
+        })
+        final_trend = pd.concat([top_df, others_df])
+    else:
+        final_trend = top_df
+
+    fig = px.bar(
+        final_trend,
+        x="Operator",
+        y="Count",
+        text="Count",
+        color="Operator"
+    )
+
+    fig.update_traces(textposition="outside")
+    fig.update_layout(showlegend=False)
+
+    st.plotly_chart(style_chart(fig), use_container_width=True)
+
+# ---------------------------
+# TREEMAP VIEW
+# ---------------------------
+elif view_mode == "Treemap View":
+
+    fig_tree = px.treemap(
+        trend,
+        path=["Operator"],
+        values="Count",
+        color="Count",
+        color_continuous_scale="Blues"
+    )
+
+    st.plotly_chart(style_chart(fig_tree), use_container_width=True)
+
+# ---------------------------
+# DATA TABLE (SEARCHABLE)
+# ---------------------------
+else:
+
+    search = st.text_input("🔍 Search Operator")
+
+    if search:
+        table_df = trend[trend["Operator"].str.contains(search, case=False)]
+    else:
+        table_df = trend
+
+    st.dataframe(table_df, use_container_width=True)
 # ---------------------------
 # TOP ROUTES
 # ---------------------------
