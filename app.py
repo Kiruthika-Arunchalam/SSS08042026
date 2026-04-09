@@ -249,7 +249,7 @@ trend.columns = ["Operator", "Count"]
 # ---------------------------
 view_mode = st.radio(
     "Select View",
-    ["Top Operators (Bar)", "Treemap View", "Data Table"]
+    ["Top Operators (Bar)", "Treemap View"]
 )
 
 # ---------------------------
