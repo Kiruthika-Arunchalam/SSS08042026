@@ -106,7 +106,11 @@ df = load_data()
 # ---------------------------
 # CLEAN DATA
 # ---------------------------
-df["Operator_Code"] = df["Operator_Code"].astype(str).str.strip()
+if "Operator_Code" in df.columns:
+    df["Operator_Code"] = df["Operator_Code"].astype(str).str.strip()
+else:
+    st.error("❌ 'Operator_Code' column not found in data")
+    st.stop()
 df["Service"] = df["Service"].astype(str).str.strip()
 df["From_Port"] = df["From_Port"].astype(str).str.strip().str.upper()
 df["To_Port"] = df["To_Port"].astype(str).str.strip().str.upper()
