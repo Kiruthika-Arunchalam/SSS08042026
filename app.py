@@ -158,12 +158,12 @@ if to_port:
 # ---------------------------
 # KPI METRICS
 # ---------------------------
-k1, k2, k3, k4 = st.columns(4)
+# k1, k2, k3, k4 = st.columns(4)
 
-k1.metric("Total Records", len(filtered_df))
-k2.metric("Operators", filtered_df["Operator_Code"].nunique())
-k3.metric("Routes", filtered_df["From_Port"].nunique())
-k4.metric("Services", filtered_df["Service"].nunique())
+# k1.metric("Total Records", len(filtered_df))
+# k2.metric("Operators", filtered_df["Operator_Code"].nunique())
+# k3.metric("Routes", filtered_df["From_Port"].nunique())
+# k4.metric("Services", filtered_df["Service"].nunique())
 
 # ---------------------------
 # CARDS
