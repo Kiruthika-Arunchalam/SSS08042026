@@ -115,8 +115,28 @@ df["Service"] = df["Service"].astype(str).str.strip()
 df["From_Port"] = df["From_Port"].astype(str).str.strip().str.upper()
 df["To_Port"] = df["To_Port"].astype(str).str.strip().str.upper()
 
-df["Inserted_At"] = pd.to_datetime(df["Inserted_At"], errors="coerce", dayfirst=True)
-df["Inserted_Date"] = df["Inserted_At"].dt.normalize()
+def parse_date(x):
+    x = str(x).strip()
+
+    formats = [
+        "%d-%m-%Y %H:%M",
+        "%d-%m-%Y %H:%M:%S",
+        "%d-%m-%Y",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%Y"
+    ]
+
+    for fmt in formats:
+        try:
+            return pd.to_datetime(x, format=fmt)
+        except:
+            continue
+
+    return pd.NaT
+
+
+df["Inserted_At"] = df["Inserted_At"].apply(parse_date)
+df["Inserted_Date"] = df["Inserted_At"]
 
 # ---------------------------
 # FILTERS
